@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Investor Dashboard — Startup Simulator AI</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <div class="main-area">
+    <div class="main-head">
+      <div style="display:flex; align-items:center; gap:14px;">
+        <button class="btn btn-ghost btn-sm" data-nav-toggle id="navToggle"><i class="fa-solid fa-bars"></i></button>
+        <div>
+          <div class="panel-title" style="margin:0;">Investor Dashboard</div>
+          <h2 style="font-size:19px; margin-top:2px;">Portfolio simulation overview</h2>
+        </div>
+      </div>
+      <span class="chip good"><i class="fa-solid fa-circle" style="font-size:6px;"></i> 4 startups tracked</span>
+    </div>
+
+    <div class="main-body">
+
+      <div class="grid-4" style="margin-bottom:20px;">
+        <div class="panel stat-card">
+          <div class="stat-top"><div class="stat-icon"><i class="fa-solid fa-briefcase"></i></div></div>
+          <div class="stat-value">4</div>
+          <div class="stat-label">Startups in portfolio simulation</div>
+        </div>
+        <div class="panel stat-card">
+          <div class="stat-top"><div class="stat-icon" style="color:var(--amber); background:var(--amber-dim);"><i class="fa-solid fa-scale-balanced"></i></div></div>
+          <div class="stat-value">62<span style="font-size:14px;">/100</span></div>
+          <div class="stat-label">Avg. investment readiness score</div>
+        </div>
+        <div class="panel stat-card">
+          <div class="stat-top"><div class="stat-icon"><i class="fa-solid fa-money-bill-trend-up"></i></div></div>
+          <div class="stat-value" id="totalFunding">—</div>
+          <div class="stat-label">Combined funding requirement</div>
+        </div>
+        <div class="panel stat-card">
+          <div class="stat-top"><div class="stat-icon" style="color:var(--coral); background:var(--coral-dim);"><i class="fa-solid fa-triangle-exclamation"></i></div></div>
+          <div class="stat-value">1</div>
+          <div class="stat-label">Flagged as high risk</div>
+        </div>
+      </div>
+
+      <div class="panel panel-pad">
+        <div class="panel-head"><div class="panel-title">Portfolio <b>Risk & Readiness</b></div></div>
+        <table>
+          <thead><tr><th>Startup</th><th>Industry</th><th>Risk Score</th><th>Business Potential</th><th>Funding Need</th><th>Scalability</th><th>Status</th></tr></thead>
+          <tbody id="portfolioTable"></tbody>
+        </table>
+      </div>
+
+      <div class="grid-3" style="margin-top:20px;">
+        <div class="panel panel-pad" style="text-align:center;">
+          <div class="panel-title" style="margin-bottom:14px;">Nimbus Freight — Risk</div>
+          <div class="gauge" id="g1" style="margin:0 auto;"></div>
+        </div>
+        <div class="panel panel-pad" style="text-align:center;">
+          <div class="panel-title" style="margin-bottom:14px;">Market Readiness</div>
+          <div class="gauge" id="g2" style="margin:0 auto;"></div>
+        </div>
+        <div class="panel panel-pad" style="text-align:center;">
+          <div class="panel-title" style="margin-bottom:14px;">Scalability Score</div>
+          <div class="gauge" id="g3" style="margin:0 auto;"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="js/sidebar.js"></script>
+<script src="js/simulation.js"></script>
+<script src="js/app.js"></script>
+<script>
+const myProfile = ProfileStore.load();
+const myResult = SimEngine.project(myProfile);
+
+const mockPeers = [
+  { name:'Lumen Health', industry:'Healthtech', funding: 620000 },
+  { name:'CartFlow', industry:'E-commerce', funding: 210000 },
+  { name:'Ledgerly', industry:'Fintech', funding: 890000 },
+];
+
+const portfolio = [
+  { name: myProfile.name, industry: capitalize(myProfile.industry), result: myResult, funding: myProfile.fundingRaised }
+].concat(mockPeers.map(p => {
+  const prof = { ...SimEngine.defaultProfile(), industry: p.industry.toLowerCase(), name: p.name, fundingRaised: p.funding };
+  return { name: p.name, industry: p.industry, result: SimEngine.project(prof), funding: p.funding };
+}));
+
+function capitalize(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+
+document.getElementById('totalFunding').textContent = SimEngine.fmtMoney(portfolio.reduce((s,p)=>s+p.funding,0));
+
+document.getElementById('portfolioTable').innerHTML = portfolio.map(p=>{
+  const t = p.result.totals;
+  const statusCls = t.riskLevel==='Low'?'good':t.riskLevel==='Moderate'?'warn':'bad';
+  return `<tr>
+    <td style="font-weight:600;">${p.name}</td>
+    <td>${p.industry}</td>
+    <td class="mono">${100-t.healthScore}</td>
+    <td class="mono" style="color:var(--cyan);">${t.healthScore}</td>
+    <td class="mono">${SimEngine.fmtMoney(p.funding)}</td>
+    <td class="mono">${Math.min(97, t.healthScore + 6)}</td>
+    <td><span class="chip ${statusCls}">${t.riskLevel} Risk</span></td>
+  </tr>`;
+}).join('');
+
+renderGauge(document.getElementById('g1'), { value: 100-myResult.totals.healthScore, max:100, size:130, color:'var(--coral)', label:'RISK INDEX' });
+renderGauge(document.getElementById('g2'), { value: Math.round(myResult.f.demand*60), max:100, size:130, color:'var(--cyan)', label:'READINESS' });
+renderGauge(document.getElementById('g3'), { value: Math.min(97, myResult.totals.healthScore+6), max:100, size:130, color:'var(--amber)', label:'SCALABILITY' });
+</script>
+</body>
+</html>

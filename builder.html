@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Startup Builder — Startup Simulator AI</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <div class="main-area">
+    <div class="main-head">
+      <div style="display:flex; align-items:center; gap:14px;">
+        <button class="btn btn-ghost btn-sm" data-nav-toggle id="navToggle"><i class="fa-solid fa-bars"></i></button>
+        <div>
+          <div class="panel-title" style="margin:0;">Startup Builder</div>
+          <h2 style="font-size:19px; margin-top:2px;">Configure your startup profile</h2>
+        </div>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <a href="dashboard.html" class="btn btn-ghost btn-sm">Skip to Dashboard</a>
+      </div>
+    </div>
+
+    <div class="main-body" style="max-width:900px;">
+
+      <!-- progress -->
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:32px;" id="progressBar"></div>
+
+      <form id="builderForm">
+        <!-- STEP 1 -->
+        <div class="panel panel-pad wizard-step" data-step="1">
+          <div class="panel-head"><div class="panel-title"><b>Step 01</b> — Startup Profile</div></div>
+          <div class="field-row">
+            <div class="field"><label>Startup Name</label><input type="text" name="name" required></div>
+            <div class="field"><label>Country</label><input type="text" name="country" required></div>
+          </div>
+          <div class="field"><label>Business Idea</label><textarea name="idea" rows="3" required></textarea></div>
+          <div class="field-row">
+            <div class="field">
+              <label>Industry</label>
+              <select name="industry">
+                <option value="saas">SaaS</option>
+                <option value="ecommerce">E-commerce</option>
+                <option value="fintech">Fintech</option>
+                <option value="healthtech">Healthtech</option>
+                <option value="edtech">Edtech</option>
+                <option value="marketplace">Marketplace</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Business Model</label>
+              <select name="businessModel">
+                <option value="subscription">Subscription</option>
+                <option value="one-time">One-time Payment</option>
+              </select>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Target Market / Customer Segment</label>
+              <select name="customerSegment">
+                <option value="smb">Small & Medium Business</option>
+                <option value="enterprise">Enterprise</option>
+                <option value="consumer">Consumer (B2C)</option>
+              </select>
+            </div>
+            <div class="field"><label>Pricing Strategy — Price (USD / mo)</label><input type="number" name="price" min="1" required></div>
+          </div>
+        </div>
+
+        <!-- STEP 2 -->
+        <div class="panel panel-pad wizard-step" data-step="2" style="display:none;">
+          <div class="panel-head"><div class="panel-title"><b>Step 02</b> — Business Configuration</div></div>
+          <div class="field-row">
+            <div class="field"><label>Team Size</label><input type="number" name="teamSize" min="1" required></div>
+            <div class="field"><label>Avg. Employee Salary (USD / mo)</label><input type="number" name="avgSalary" min="0" required></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Office Expenses (USD / mo)</label><input type="number" name="officeExpense" min="0" required></div>
+            <div class="field"><label>Cloud Infrastructure Cost (USD / mo)</label><input type="number" name="cloudCost" min="0" required></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Marketing Budget (USD / mo)</label><input type="number" name="marketingBudget" min="0" required></div>
+            <div class="field"><label>Product Development Budget (USD / mo)</label><input type="number" name="productBudget" min="0" required></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Customer Support Cost (USD / mo)</label><input type="number" name="supportCost" min="0" required></div>
+            <div class="field"><label>Legal Expenses (USD / mo)</label><input type="number" name="legalCost" min="0" required></div>
+          </div>
+        </div>
+
+        <!-- STEP 3 -->
+        <div class="panel panel-pad wizard-step" data-step="3" style="display:none;">
+          <div class="panel-head"><div class="panel-title"><b>Step 03</b> — Funding & Launch</div></div>
+          <div class="field-row">
+            <div class="field"><label>Funding Raised So Far (USD)</label><input type="number" name="fundingRaised" min="0" required></div>
+            <div class="field"><label>Launch Delay (months)</label><input type="number" name="launchDelayMonths" min="0" max="12" value="0"></div>
+          </div>
+          <div class="field" style="margin-top:6px;">
+            <div class="panel" style="background:var(--panel); padding:16px 18px;">
+              <div class="stat-label"><i class="fa-solid fa-circle-info" style="color:var(--cyan); margin-right:6px;"></i>Once submitted, the AI Business Simulation runs a 24-month forecast covering customer acquisition, revenue, expenses, burn rate, break-even and risk — viewable on your dashboard.</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; margin-top:24px;">
+          <button type="button" class="btn btn-ghost" id="prevBtn" style="visibility:hidden;"><i class="fa-solid fa-arrow-left"></i> Back</button>
+          <div style="display:flex; gap:10px;">
+            <button type="button" class="btn btn-ghost btn-sm" id="fillSample"><i class="fa-solid fa-wand-magic-sparkles"></i> Fill Sample Data</button>
+            <button type="button" class="btn btn-primary" id="nextBtn">Continue <i class="fa-solid fa-arrow-right"></i></button>
+          </div>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<script src="js/sidebar.js"></script>
+<script src="js/simulation.js"></script>
+<script src="js/app.js"></script>
+<script>
+const steps = Array.from(document.querySelectorAll('.wizard-step'));
+let current = 0;
+const form = document.getElementById('builderForm');
+const progressBar = document.getElementById('progressBar');
+
+function renderProgress(){
+  progressBar.innerHTML = steps.map((s,i)=>`
+    <div style="flex:1; height:5px; border-radius:4px; background:${i<=current ? 'var(--amber)' : 'var(--line-strong)'}; transition:background .25s;"></div>
+  `).join('<div style="width:6px;"></div>');
+}
+function showStep(i){
+  steps.forEach((s,idx)=> s.style.display = idx===i ? 'block' : 'none');
+  document.getElementById('prevBtn').style.visibility = i===0 ? 'hidden' : 'visible';
+  document.getElementById('nextBtn').innerHTML = i===steps.length-1 ? 'Run Simulation <i class="fa-solid fa-bolt"></i>' : 'Continue <i class="fa-solid fa-arrow-right"></i>';
+  renderProgress();
+}
+document.getElementById('prevBtn').addEventListener('click', ()=>{ if(current>0){ current--; showStep(current); } });
+document.getElementById('nextBtn').addEventListener('click', ()=>{
+  const inputs = steps[current].querySelectorAll('input[required], textarea[required]');
+  for (const inp of inputs){ if(!inp.reportValidity()) return; }
+
+  if (current < steps.length-1){ current++; showStep(current); return; }
+
+  // final step -> build profile & save
+  const fd = new FormData(form);
+  const profile = SimEngine.defaultProfile();
+  for (const [key, val] of fd.entries()){
+    if (['price','teamSize','avgSalary','officeExpense','cloudCost','marketingBudget','productBudget','supportCost','legalCost','fundingRaised','launchDelayMonths'].includes(key)){
+      profile[key] = Number(val);
+    } else {
+      profile[key] = val;
+    }
+  }
+  ProfileStore.save(profile);
+  window.location.href = 'dashboard.html?new=1';
+});
+
+document.getElementById('fillSample').addEventListener('click', ()=>{
+  const p = SimEngine.defaultProfile();
+  Object.entries(p).forEach(([key,val])=>{
+    const el = form.elements[key];
+    if (el) el.value = val;
+  });
+});
+
+showStep(0);
+</script>
+</body>
+</html>

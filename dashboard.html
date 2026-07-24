@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Founder Dashboard — Startup Simulator AI</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <div class="main-area">
+    <div class="main-head">
+      <div style="display:flex; align-items:center; gap:14px;">
+        <button class="btn btn-ghost btn-sm" data-nav-toggle id="navToggle"><i class="fa-solid fa-bars"></i></button>
+        <div>
+          <div class="panel-title" style="margin:0;">Founder Dashboard</div>
+          <h2 style="font-size:19px; margin-top:2px;" id="startupNameHead">Nimbus Freight</h2>
+        </div>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <a href="builder.html" class="btn btn-ghost btn-sm"><i class="fa-solid fa-pen"></i> Edit Profile</a>
+        <a href="simulator.html" class="btn btn-primary btn-sm"><i class="fa-solid fa-code-compare"></i> Run What-If</a>
+      </div>
+    </div>
+
+    <div class="main-body">
+
+      <!-- top row: health ring + KPIs -->
+      <div style="display:grid; grid-template-columns:280px 1fr; gap:20px; margin-bottom:20px;" class="dash-top-grid">
+        <div class="panel panel-pad" style="display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
+          <div class="panel-title" style="margin-bottom:14px;">Startup Health Score</div>
+          <div class="gauge" id="healthGauge"></div>
+          <span class="chip" id="riskChip" style="margin-top:14px;">Risk: —</span>
+        </div>
+
+        <div class="grid-4" id="kpiGrid" style="grid-template-columns:repeat(4,1fr);"></div>
+      </div>
+
+      <!-- charts row -->
+      <div class="grid-2" style="margin-bottom:20px;">
+        <div class="panel panel-pad">
+          <div class="panel-head">
+            <div class="panel-title">Revenue vs <b>Expenses</b></div>
+            <span class="chip good">24-mo forecast</span>
+          </div>
+          <canvas id="revChart" height="230"></canvas>
+        </div>
+        <div class="panel panel-pad">
+          <div class="panel-head">
+            <div class="panel-title">Customer <b>Growth Curve</b></div>
+            <span class="chip">Net customers / mo</span>
+          </div>
+          <canvas id="custChart" height="230"></canvas>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:20px;">
+        <div class="panel panel-pad">
+          <div class="panel-head">
+            <div class="panel-title">Cash <b>Runway</b></div>
+          </div>
+          <canvas id="cashChart" height="220"></canvas>
+        </div>
+
+        <div class="panel panel-pad">
+          <div class="panel-head">
+            <div class="panel-title">Funding <b>Status</b></div>
+          </div>
+          <div id="fundingBlock"></div>
+        </div>
+      </div>
+
+      <!-- AI Advisor -->
+      <div class="panel panel-pad">
+        <div class="panel-head">
+          <div class="panel-title"><i class="fa-solid fa-user-tie" style="color:var(--amber); margin-right:8px;"></i>AI Business Advisor</div>
+          <span class="chip warn"><i class="fa-solid fa-sparkles"></i> Generated from your live forecast</span>
+        </div>
+        <div id="recoList" style="display:flex; flex-direction:column; gap:12px;"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script src="js/sidebar.js"></script>
+<script src="js/simulation.js"></script>
+<script src="js/app.js"></script>
+<script>
+const profile = ProfileStore.load();
+document.getElementById('startupNameHead').textContent = profile.name || 'Untitled Startup';
+
+const result = SimEngine.project(profile);
+const { series, totals } = result;
+
+// health gauge
+const healthColor = totals.healthScore >= 70 ? 'var(--cyan)' : totals.healthScore >= 45 ? 'var(--amber)' : 'var(--coral)';
+renderGauge(document.getElementById('healthGauge'), { value: totals.healthScore, max:100, size:150, stroke:12, color:healthColor, label:'/ 100' });
+const riskChip = document.getElementById('riskChip');
+riskChip.textContent = 'Risk: ' + totals.riskLevel;
+riskChip.className = 'chip ' + (totals.riskLevel==='Low'?'good':totals.riskLevel==='Moderate'?'warn':'bad');
+
+// KPI grid
+const kpis = [
+  { icon:'fa-users', label:'Total Customers (mo 24)', value: totals.finalCustomers.toLocaleString(), color:'var(--cyan)' },
+  { icon:'fa-sack-dollar', label:'Monthly Revenue (mo 24)', value: SimEngine.fmtMoney(totals.finalRevenue), color:'var(--cyan)' },
+  { icon:'fa-fire', label:'Avg. Burn Rate (6mo)', value: SimEngine.fmtMoney(totals.avgBurn), color:'var(--coral)' },
+  { icon:'fa-flag-checkered', label:'Break-Even', value: totals.breakEvenMonth ? `Month ${totals.breakEvenMonth}` : 'Not reached', color:'var(--amber)' },
+  { icon:'fa-hourglass-half', label:'Cash Runway', value: totals.runwayMonths >= 99 ? '24+ mo' : totals.runwayMonths+' mo', color:'var(--text)' },
+  { icon:'fa-bullseye', label:'Marketing ROI', value: totals.marketingROI+'%', color: totals.marketingROI>=0 ? 'var(--cyan)' : 'var(--coral)' },
+  { icon:'fa-building-columns', label:'Funding Raised', value: SimEngine.fmtMoney(profile.fundingRaised), color:'var(--text)' },
+  { icon:'fa-earth-americas', label:'Market Demand Index', value: result.f.demand.toFixed(2)+'x', color:'var(--amber)' },
+];
+document.getElementById('kpiGrid').innerHTML = kpis.map(k=>`
+  <div class="panel stat-card">
+    <div class="stat-top"><div class="stat-icon" style="color:${k.color}; background:${k.color==='var(--coral)'?'var(--coral-dim)':k.color==='var(--amber)'?'var(--amber-dim)':'var(--cyan-dim)'};"><i class="fa-solid ${k.icon}"></i></div></div>
+    <div class="stat-value" style="color:${k.color}; font-size:21px;">${k.value}</div>
+    <div class="stat-label">${k.label}</div>
+  </div>
+`).join('');
+
+// Revenue vs expenses chart
+new Chart(document.getElementById('revChart'), {
+  type:'line',
+  data:{
+    labels: series.map(r=>'M'+r.month),
+    datasets:[
+      { label:'Revenue', data: series.map(r=>r.revenue), borderColor:'#38D9C9', backgroundColor:'rgba(56,217,201,0.10)', fill:true, tension:0.35, pointRadius:0, borderWidth:2 },
+      { label:'Expenses', data: series.map(r=>r.expenses), borderColor:'#FF6B5B', backgroundColor:'transparent', borderDash:[4,4], tension:0.35, pointRadius:0, borderWidth:2 }
+    ]
+  },
+  options: chartOpts(v=>SimEngine.fmtMoney(v))
+});
+
+// Customer growth
+new Chart(document.getElementById('custChart'), {
+  type:'bar',
+  data:{
+    labels: series.map(r=>'M'+r.month),
+    datasets:[{ label:'Total Customers', data: series.map(r=>r.customers), backgroundColor:'rgba(245,166,35,0.55)', borderRadius:4, maxBarThickness:16 }]
+  },
+  options: chartOpts(v=>v)
+});
+
+// Cash runway
+new Chart(document.getElementById('cashChart'), {
+  type:'line',
+  data:{
+    labels: series.map(r=>'M'+r.month),
+    datasets:[{ label:'Cash on Hand', data: series.map(r=>r.cash), borderColor:'#38D9C9', backgroundColor:'rgba(56,217,201,0.08)', fill:true, tension:0.3, pointRadius:0, borderWidth:2 }]
+  },
+  options: chartOpts(v=>SimEngine.fmtMoney(v))
+});
+
+function chartOpts(yFmt){
+  return {
+    responsive:true, maintainAspectRatio:true,
+    plugins:{ legend:{ labels:{ color:'#8A97B4', boxWidth:10, font:{ family:'JetBrains Mono', size:10 } } } },
+    scales:{
+      x:{ ticks:{ color:'#5B6784', font:{ size:9 }, maxTicksLimit:8 }, grid:{ display:false } },
+      y:{ ticks:{ color:'#5B6784', font:{ size:10 }, callback:yFmt }, grid:{ color:'rgba(148,168,204,0.06)' } }
+    }
+  };
+}
+
+// Funding block
+const monthsOfCash = totals.runwayMonths >= 99 ? 24 : totals.runwayMonths;
+document.getElementById('fundingBlock').innerHTML = `
+  <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+    <span class="stat-label">Raised to date</span><span class="mono" style="font-weight:700;">${SimEngine.fmtMoney(profile.fundingRaised)}</span>
+  </div>
+  <div style="height:8px; border-radius:6px; background:var(--bg); overflow:hidden; margin-bottom:18px;">
+    <div style="height:100%; width:${Math.min(100, monthsOfCash/24*100)}%; background:linear-gradient(90deg, var(--cyan), var(--amber));"></div>
+  </div>
+  <div class="stat-label" style="margin-bottom:14px;">Runway covers <b class="mono" style="color:var(--text);">${monthsOfCash} of 24</b> forecast months.</div>
+  <div class="chip ${totals.runwayMonths < 9 ? 'bad' : 'good'}" style="width:fit-content;">
+    <i class="fa-solid ${totals.runwayMonths < 9 ? 'fa-triangle-exclamation' : 'fa-check'}"></i>
+    ${totals.runwayMonths < 9 ? 'Consider raising a bridge round' : 'No near-term funding gap projected'}
+  </div>
+`;
+
+// Recommendations
+const recs = SimEngine.recommendations(result);
+document.getElementById('recoList').innerHTML = recs.map(r=>`
+  <div style="display:flex; gap:14px; padding:14px 16px; border:1px solid var(--line); border-radius:12px; background:var(--panel);">
+    <div class="stat-icon" style="flex-shrink:0; color:${r.tone==='good'?'var(--cyan)':r.tone==='warn'?'var(--amber)':'var(--coral)'}; background:${r.tone==='good'?'var(--cyan-dim)':r.tone==='warn'?'var(--amber-dim)':'var(--coral-dim)'};">
+      <i class="fa-solid ${r.tone==='good'?'fa-circle-check':r.tone==='warn'?'fa-triangle-exclamation':'fa-circle-xmark'}"></i>
+    </div>
+    <div>
+      <div style="font-weight:600; font-size:14px; margin-bottom:3px;">${r.title}</div>
+      <div class="stat-label">${r.body}</div>
+    </div>
+  </div>
+`).join('');
+</script>
+<style>
+@media (max-width:860px){ .dash-top-grid{ grid-template-columns:1fr !important; } #kpiGrid{ grid-template-columns:repeat(2,1fr) !important; } }
+</style>
+</body>
+</html>

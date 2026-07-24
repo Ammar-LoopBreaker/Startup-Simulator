@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Startup Simulator AI — Build Your Startup Virtually Before Building It in Reality</title>
+<meta name="description" content="An AI-powered digital twin for your startup. Simulate revenue, burn rate, funding needs and market risk before you spend a single real dollar.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="status-strip">
+  <span><i class="dot"></i> SIMULATION ENGINE ONLINE</span>
+  <span><i class="dot amber"></i> 3,300+ STARTUP MODELS TRAINED</span>
+  <span><i class="dot"></i> MARKET DATA SYNCED 2 MIN AGO</span>
+  <span><i class="dot amber"></i> 24-MONTH FORECAST WINDOW</span>
+</div>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="brand"><span class="brand-mark"><i class="fa-solid fa-gauge-high"></i></span> Startup Simulator <span style="color:var(--amber)">AI</span></a>
+    <nav class="nav-links">
+      <a href="index.html#how-it-works">How It Works</a>
+      <a href="index.html#modules">Modules</a>
+      <a href="index.html#features">Features</a>
+      <a href="index.html#roles">Who It's For</a>
+      <a href="index.html#stack">Tech Stack</a>
+    </nav>
+    <div class="nav-cta">
+      <a href="dashboard.html" class="btn btn-ghost btn-sm">Sign In</a>
+      <a href="builder.html" class="btn btn-primary btn-sm"><i class="fa-solid fa-play"></i> Launch Simulator</a>
+    </div>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="section" style="padding-top:72px; padding-bottom:60px;">
+  <div class="container" style="display:grid; grid-template-columns:1.05fr 0.95fr; gap:56px; align-items:center;">
+    <div data-aos="fade-right">
+      <div class="eyebrow">DIGITAL TWIN FOR YOUR STARTUP</div>
+      <h1 class="section-title" style="max-width:600px; font-size:clamp(32px,4.4vw,50px);">Build your startup virtually — before building it in reality.</h1>
+      <p class="section-sub" style="max-width:520px;">Enter your idea, pricing, team and budget. The simulator runs it through an AI-driven market model and hands back the revenue curve, burn rate and break-even date you'd otherwise wait a year to discover.</p>
+      <div style="display:flex; gap:14px; margin-top:32px; flex-wrap:wrap;">
+        <a href="builder.html" class="btn btn-primary"><i class="fa-solid fa-rocket"></i> Simulate My Startup</a>
+        <a href="dashboard.html" class="btn btn-ghost"><i class="fa-solid fa-chart-line"></i> View Sample Dashboard</a>
+      </div>
+      <div style="display:flex; gap:32px; margin-top:44px;">
+        <div><div class="mono" id="heroStat1" style="font-size:26px; font-weight:700; color:var(--cyan);">0</div><div class="stat-label">Startups modeled</div></div>
+        <div><div class="mono" id="heroStat2" style="font-size:26px; font-weight:700; color:var(--amber);">0%</div><div class="stat-label">Avg. forecast confidence</div></div>
+        <div><div class="mono" id="heroStat3" style="font-size:26px; font-weight:700;">0</div><div class="stat-label">What-if scenarios run daily</div></div>
+      </div>
+    </div>
+
+    <!-- signature instrument cluster -->
+    <div class="panel panel-pad" data-aos="fade-left" style="position:relative; overflow:hidden;">
+      <div style="position:absolute; inset:0; background:radial-gradient(circle at 80% -10%, rgba(56,217,201,0.10), transparent 55%); pointer-events:none;"></div>
+      <div class="panel-head">
+        <div class="panel-title">Live Instrument Cluster — <b>Nimbus Freight</b></div>
+        <span class="chip good"><i class="fa-solid fa-circle" style="font-size:6px;"></i> Nominal</span>
+      </div>
+
+      <div style="display:flex; justify-content:space-around; margin-bottom:26px; flex-wrap:wrap; gap:16px;">
+        <div style="text-align:center;">
+          <div class="gauge" id="heroGauge1"></div>
+        </div>
+        <div style="text-align:center;">
+          <div class="gauge" id="heroGauge2"></div>
+        </div>
+        <div style="text-align:center;">
+          <div class="gauge" id="heroGauge3"></div>
+        </div>
+      </div>
+
+      <div style="border-top:1px solid var(--line); padding-top:18px;">
+        <canvas id="heroChart" height="120"></canvas>
+      </div>
+
+      <div class="grid-3" style="margin-top:18px; gap:12px;">
+        <div class="panel" style="background:var(--panel); padding:12px 14px;">
+          <div class="stat-label">Burn Rate / mo</div>
+          <div class="mono" style="font-weight:700; color:var(--coral); font-size:15px;">$18.4K</div>
+        </div>
+        <div class="panel" style="background:var(--panel); padding:12px 14px;">
+          <div class="stat-label">Runway</div>
+          <div class="mono" style="font-weight:700; font-size:15px;">14 mo</div>
+        </div>
+        <div class="panel" style="background:var(--panel); padding:12px 14px;">
+          <div class="stat-label">Break-even</div>
+          <div class="mono" style="font-weight:700; color:var(--cyan); font-size:15px;">Month 11</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROBLEM ============ -->
+<section class="section" style="padding-top:20px;">
+  <div class="container">
+    <div class="grid-2" style="align-items:center;">
+      <div data-aos="fade-right">
+        <div class="eyebrow">THE PROBLEM</div>
+        <h2 class="section-title">Most startups fail from unvalidated guesses, not bad ideas.</h2>
+        <p class="section-sub">Founders estimate demand, pricing, hiring and runway with static spreadsheets that can't react to changing conditions — so costly mistakes surface only after the money is already spent.</p>
+      </div>
+      <div class="grid-2" data-aos="fade-left">
+        <div class="panel stat-card">
+          <div class="stat-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          <div class="stat-value">90%</div>
+          <div class="stat-label">of startups fail within 5 years, most from misjudged demand</div>
+        </div>
+        <div class="panel stat-card">
+          <div class="stat-icon" style="color:var(--amber); background:var(--amber-dim);"><i class="fa-solid fa-file-excel"></i></div>
+          <div class="stat-value">Static</div>
+          <div class="stat-label">spreadsheets can't simulate changing market conditions</div>
+        </div>
+        <div class="panel stat-card">
+          <div class="stat-icon" style="color:var(--coral); background:var(--coral-dim);"><i class="fa-solid fa-hourglass-half"></i></div>
+          <div class="stat-value">12–18 mo</div>
+          <div class="stat-label">typical time before founders discover pricing was wrong</div>
+        </div>
+        <div class="panel stat-card">
+          <div class="stat-icon"><i class="fa-solid fa-coins"></i></div>
+          <div class="stat-value">Real $</div>
+          <div class="stat-label">spent validating assumptions that a model could test first</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section class="section" id="how-it-works">
+  <div class="container">
+    <div class="eyebrow" data-aos="fade-up">FLIGHT PLAN</div>
+    <h2 class="section-title" data-aos="fade-up">Six steps from idea to investable forecast.</h2>
+    <p class="section-sub" data-aos="fade-up">Every startup profile moves through the same instrumented sequence — nothing is skipped, nothing is guessed.</p>
+
+    <div style="margin-top:48px; display:flex; flex-direction:column; gap:0;">
+      <div class="how-row" data-aos="fade-up" data-step="01" data-icon="fa-file-signature" data-title="Create Startup Profile" data-desc="Name, idea, industry, target market, country, business model, pricing strategy and customer segment."></div>
+      <div class="how-row" data-aos="fade-up" data-step="02" data-icon="fa-sliders" data-title="Business Configuration" data-desc="Team size, salaries, office and cloud costs, marketing budget, product budget, support and legal expenses."></div>
+      <div class="how-row" data-aos="fade-up" data-step="03" data-icon="fa-magnifying-glass-chart" data-title="Market Analysis" data-desc="Market size, competitor density, industry growth, demand trends, personas, pricing competitiveness, SWOT."></div>
+      <div class="how-row" data-aos="fade-up" data-step="04" data-icon="fa-brain" data-title="AI Business Simulation" data-desc="Customer acquisition, revenue, expenses, P&L, cash flow, burn rate, churn, marketing ROI, hiring needs, risk."></div>
+      <div class="how-row" data-aos="fade-up" data-step="05" data-icon="fa-code-compare" data-title="What-If Simulator" data-desc="Raise price 20%, hire five developers, double marketing spend, expand markets, delay launch — instantly recalculated."></div>
+      <div class="how-row" data-aos="fade-up" data-step="06" data-icon="fa-lightbulb" data-title="AI Recommendations" data-desc="Optimal pricing, cost reduction, hiring priorities, funding timing and growth opportunities, in plain language."></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CORE MODULES ============ -->
+<section class="section" id="modules" style="background:var(--panel); border-top:1px solid var(--line); border-bottom:1px solid var(--line);">
+  <div class="container">
+    <div class="eyebrow" data-aos="fade-up">CORE MODULES</div>
+    <h2 class="section-title" data-aos="fade-up">Seven instruments. One control panel.</h2>
+
+    <div class="grid-4" style="margin-top:40px;">
+      <div class="panel panel-pad" data-aos="fade-up" data-aos-delay="0">
+        <div class="stat-icon" style="margin-bottom:14px;"><i class="fa-solid fa-hammer"></i></div>
+        <h3 style="font-size:16px; margin-bottom:8px;">Startup Builder</h3>
+        <p class="stat-label">Create and configure the startup profile.</p>
+      </div>
+      <div class="panel panel-pad" data-aos="fade-up" data-aos-delay="60">
+        <div class="stat-icon" style="margin-bottom:14px; color:var(--amber); background:var(--amber-dim);"><i class="fa-solid fa-earth-americas"></i></div>
+        <h3 style="font-size:16px; margin-bottom:8px;">Market Intelligence</h3>
+        <p class="stat-label">Analyze market trends, competitors and opportunities.</p>
+      </div>
+      <div class="panel panel-pad" data-aos="fade-up" data-aos-delay="120">
+        <div class="stat-icon" style="margin-bottom:14px;"><i class="fa-solid fa-money-bill-trend-up"></i></div>
+        <h3 style="font-size:16px; margin-bottom:8px;">Financial Simulator</h3>
+        <p class="stat-label">Forecast revenue, costs, cash flow and funding needs.</p>
+      </div>
+      <div class="panel panel-pad" data-aos="fade-up" data-aos-delay="180">
+        <div class="stat-icon" style="margin-bottom:14px; color:var(--amber); background:var(--amber-dim);"><i class="fa-solid fa-users"></i></div>
+        <h3 style="font-size:16px; margin-bottom:8px;">Customer Growth Predictor</h3>
+        <p class="stat-label">Estimate customer acquisition and retention.</p>
+      </div>
+      <div class="panel panel-pad" data-aos="fade-up" data-aos-delay="0">
+        <div class="stat-icon" style="margin-bottom:14px;"><i class="fa-solid fa-piggy-bank"></i></div>
+        <h3 style="font-size:16px; margin-bottom:8px;">Funding Planner</h3>
+        <p class="stat-label">Determine when and how much funding may be required.</p>
+      </div>
+      <div class="panel panel-pad" data-aos="fade-up" data-aos-delay="60">
+        <div class="stat-icon" style="margin-bottom:14px; color:var(--coral); background:var(--coral-dim);"><i class="fa-solid fa-shield-halved"></i></div>
+        <h3 style="font-size:16px; margin-bottom:8px;">Risk Analyzer</h3>
+        <p class="stat-label">Highlight financial, operational and competitive risks.</p>
+      </div>
+      <div class="panel panel-pad" data-aos="fade-up" data-aos-delay="120">
+        <div class="stat-icon" style="margin-bottom:14px;"><i class="fa-solid fa-code-compare"></i></div>
+        <h3 style="font-size:16px; margin-bottom:8px;">Strategy Simulator</h3>
+        <p class="stat-label">Compare different business decisions before implementation.</p>
+      </div>
+      <div class="panel panel-pad" data-aos="fade-up" data-aos-delay="180">
+        <div class="stat-icon" style="margin-bottom:14px; color:var(--amber); background:var(--amber-dim);"><i class="fa-solid fa-user-tie"></i></div>
+        <h3 style="font-size:16px; margin-bottom:8px;">AI Business Advisor</h3>
+        <p class="stat-label">Generate personalized recommendations and strategic insights.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FEATURES ============ -->
+<section class="section" id="features">
+  <div class="container">
+    <div class="eyebrow" data-aos="fade-up">KEY FEATURES</div>
+    <h2 class="section-title" data-aos="fade-up">Everything a pitch deck promises, actually simulated.</h2>
+    <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:32px;" data-aos="fade-up">
+      <span class="chip">AI Startup Validation</span>
+      <span class="chip">Market Opportunity Analysis</span>
+      <span class="chip">Competitor Comparison</span>
+      <span class="chip">Customer Growth Forecast</span>
+      <span class="chip">Revenue Projection</span>
+      <span class="chip">Expense Forecasting</span>
+      <span class="chip">Burn Rate Analysis</span>
+      <span class="chip">Cash Flow Simulation</span>
+      <span class="chip">Funding Requirement Estimation</span>
+      <span class="chip">Break-Even Prediction</span>
+      <span class="chip">What-If Scenario Simulation</span>
+      <span class="chip">Business Health Score</span>
+      <span class="chip">Risk Heatmap</span>
+      <span class="chip">AI Business Consultant</span>
+      <span class="chip">Investor Pitch Generator</span>
+      <span class="chip">Business Plan Generator</span>
+      <span class="chip">KPI Dashboard</span>
+      <span class="chip">Team Growth Planner</span>
+      <span class="chip">Marketing ROI Predictor</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DASHBOARD PREVIEW ============ -->
+<section class="section" style="background:var(--panel); border-top:1px solid var(--line); border-bottom:1px solid var(--line);">
+  <div class="container grid-2" style="align-items:center;">
+    <div data-aos="fade-right">
+      <div class="eyebrow">FOUNDER DASHBOARD</div>
+      <h2 class="section-title">Every instrument you need before your next board meeting.</h2>
+      <p class="section-sub">Startup Health Score, market opportunity, revenue forecast, customer growth curve, burn rate, cash runway, funding status and AI recommendations — updated the moment you change an input.</p>
+      <a href="dashboard.html" class="btn btn-primary" style="margin-top:24px;"><i class="fa-solid fa-arrow-right"></i> Open the Dashboard</a>
+    </div>
+    <div class="panel panel-pad" data-aos="fade-left">
+      <div class="grid-2" style="gap:14px;">
+        <div class="panel stat-card" style="background:var(--panel);">
+          <div class="stat-label">Health Score</div>
+          <div class="stat-value" style="color:var(--cyan);">78<span style="font-size:16px;">/100</span></div>
+        </div>
+        <div class="panel stat-card" style="background:var(--panel);">
+          <div class="stat-label">Risk Level</div>
+          <div class="stat-value" style="color:var(--amber);">Moderate</div>
+        </div>
+        <div class="panel stat-card" style="background:var(--panel);">
+          <div class="stat-label">MRR Forecast</div>
+          <div class="stat-value">$42.1K</div>
+        </div>
+        <div class="panel stat-card" style="background:var(--panel);">
+          <div class="stat-label">Cash Runway</div>
+          <div class="stat-value">14 mo</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ROLES ============ -->
+<section class="section" id="roles">
+  <div class="container">
+    <div class="eyebrow" data-aos="fade-up">WHO IT'S FOR</div>
+    <h2 class="section-title" data-aos="fade-up">One simulator, six seats at the table.</h2>
+    <div class="grid-3" style="margin-top:36px;">
+      <div class="panel panel-pad" data-aos="fade-up"><i class="fa-solid fa-user-astronaut" style="color:var(--cyan); font-size:18px;"></i><h3 style="font-size:15px; margin:12px 0 6px;">Founder</h3><p class="stat-label">Create and simulate startup ideas end-to-end.</p></div>
+      <div class="panel panel-pad" data-aos="fade-up" data-aos-delay="60"><i class="fa-solid fa-people-arrows" style="color:var(--amber); font-size:18px;"></i><h3 style="font-size:15px; margin:12px 0 6px;">Co-Founder</h3><p class="stat-label">Collaborate on business planning together.</p></div>
+      <div class="panel panel-pad" data-aos="fade-up" data-aos-delay="120"><i class="fa-solid fa-chart-pie" style="color:var(--cyan); font-size:18px;"></i><h3 style="font-size:15px; margin:12px 0 6px;">Investor</h3><p class="stat-label">Review startup simulations and business health.</p></div>
+      <div class="panel panel-pad" data-aos="fade-up"><i class="fa-solid fa-compass" style="color:var(--amber); font-size:18px;"></i><h3 style="font-size:15px; margin:12px 0 6px;">Mentor</h3><p class="stat-label">Provide feedback and recommendations.</p></div>
+      <div class="panel panel-pad" data-aos="fade-up" data-aos-delay="60"><i class="fa-solid fa-building-columns" style="color:var(--cyan); font-size:18px;"></i><h3 style="font-size:15px; margin:12px 0 6px;">Incubator / Accelerator</h3><p class="stat-label">Monitor and evaluate multiple startups at once.</p></div>
+      <div class="panel panel-pad" data-aos="fade-up" data-aos-delay="120"><i class="fa-solid fa-gear" style="color:var(--amber); font-size:18px;"></i><h3 style="font-size:15px; margin:12px 0 6px;">Administrator</h3><p class="stat-label">Manage users and platform settings.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TECH STACK ============ -->
+<section class="section" id="stack" style="background:var(--panel); border-top:1px solid var(--line); border-bottom:1px solid var(--line);">
+  <div class="container">
+    <div class="eyebrow" data-aos="fade-up">UNDER THE HOOD</div>
+    <h2 class="section-title" data-aos="fade-up">Built like a real product, not a mockup.</h2>
+    <div class="grid-4" style="margin-top:36px;">
+      <div data-aos="fade-up">
+        <h4 style="font-size:12.5px; color:var(--text-muted); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:12px;">Frontend</h4>
+        <ul style="display:flex; flex-direction:column; gap:8px; font-size:13.5px; color:var(--text-faint);">
+          <li>HTML5 / CSS3 / ES6</li><li>Tailwind-style utility CSS</li><li>Chart.js</li><li>Font Awesome</li>
+        </ul>
+      </div>
+      <div data-aos="fade-up" data-aos-delay="60">
+        <h4 style="font-size:12.5px; color:var(--text-muted); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:12px;">Backend</h4>
+        <ul style="display:flex; flex-direction:column; gap:8px; font-size:13.5px; color:var(--text-faint);">
+          <li>FastAPI / Python</li><li>Celery + Redis</li><li>WebSockets</li>
+        </ul>
+      </div>
+      <div data-aos="fade-up" data-aos-delay="120">
+        <h4 style="font-size:12.5px; color:var(--text-muted); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:12px;">Data</h4>
+        <ul style="display:flex; flex-direction:column; gap:8px; font-size:13.5px; color:var(--text-faint);">
+          <li>PostgreSQL</li><li>MongoDB</li><li>Redis</li>
+        </ul>
+      </div>
+      <div data-aos="fade-up" data-aos-delay="180">
+        <h4 style="font-size:12.5px; color:var(--text-muted); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:12px;">AI / ML</h4>
+        <ul style="display:flex; flex-direction:column; gap:8px; font-size:13.5px; color:var(--text-faint);">
+          <li>LangChain + LLM advisor</li><li>Prophet forecasting</li><li>Scikit-learn / Pandas</li><li>Qdrant vector DB</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA ============ -->
+<section class="section">
+  <div class="container">
+    <div class="panel panel-pad" style="text-align:center; padding:64px 32px; background:linear-gradient(135deg, var(--panel-raised), var(--panel));" data-aos="fade-up">
+      <h2 class="section-title" style="max-width:640px; margin:0 auto;">Stop guessing. Start simulating.</h2>
+      <p class="section-sub" style="margin:16px auto 0;">Run your first 24-month forecast in under three minutes — no spreadsheet required.</p>
+      <a href="builder.html" class="btn btn-primary" style="margin-top:28px;"><i class="fa-solid fa-rocket"></i> Simulate My Startup, Free</a>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container footer-grid">
+    <div>
+      <a href="index.html" class="brand"><span class="brand-mark"><i class="fa-solid fa-gauge-high"></i></span> Startup Simulator AI</a>
+      <p class="stat-label" style="max-width:280px; margin-top:14px;">Build your startup virtually before building it in reality.</p>
+    </div>
+    <div class="footer-cols"><h4>Product</h4><a href="dashboard.html">Dashboard</a><a href="simulator.html">What-If Simulator</a><a href="builder.html">Startup Builder</a><a href="investor.html">Investor View</a></div>
+    <div class="footer-cols"><h4>Company</h4><a href="#how-it-works">How It Works</a><a href="#modules">Modules</a><a href="#roles">Who It's For</a></div>
+    <div class="footer-cols"><h4>Resources</h4><a href="#stack">Tech Stack</a><a href="#features">Features</a></div>
+  </div>
+  <div class="container" style="margin-top:32px; padding-top:24px; border-top:1px solid var(--line); font-size:12.5px; color:var(--text-faint);">
+    © 2026 Startup Simulator AI. Prototype interface — all figures are simulated, not financial advice.
+  </div>
+</footer>
+
+<style>
+.how-row{
+  display:grid; grid-template-columns:110px 1fr; gap:28px; align-items:flex-start;
+  padding:28px 0; border-top:1px solid var(--line);
+}
+.how-row:last-child{ border-bottom:1px solid var(--line); }
+.how-row::before{
+  content: attr(data-step);
+  font-family:var(--font-mono); font-size:13px; color:var(--amber); letter-spacing:0.08em;
+  padding-top:4px;
+}
+.how-row::after{ content:''; }
+</style>
+<script>
+document.querySelectorAll('.how-row').forEach(row=>{
+  const icon = row.getAttribute('data-icon');
+  const title = row.getAttribute('data-title');
+  const desc = row.getAttribute('data-desc');
+  row.insertAdjacentHTML('beforeend', `
+    <div style="display:flex; gap:18px; align-items:flex-start;">
+      <div class="stat-icon" style="flex-shrink:0; width:44px; height:44px; font-size:17px;"><i class="fa-solid ${icon}"></i></div>
+      <div>
+        <h3 style="font-size:17px; margin-bottom:6px;">${title}</h3>
+        <p class="stat-label" style="font-size:13.5px; max-width:640px;">${desc}</p>
+      </div>
+    </div>`);
+});
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script src="js/simulation.js"></script>
+<script src="js/app.js"></script>
+<script>
+// Hero gauges
+renderGauge(document.getElementById('heroGauge1'), { value:78, max:100, size:104, color:'var(--cyan)', label:'HEALTH', suffix:'' });
+renderGauge(document.getElementById('heroGauge2'), { value:64, max:100, size:104, color:'var(--amber)', label:'MARKET FIT', suffix:'' });
+renderGauge(document.getElementById('heroGauge3'), { value:71, max:100, size:104, color:'var(--cyan)', label:'FUNDING READY', suffix:'' });
+
+// Hero counters
+animateCount(document.getElementById('heroStat1'), 3300, { suffix:'+' });
+animateCount(document.getElementById('heroStat2'), 92, { suffix:'%' });
+animateCount(document.getElementById('heroStat3'), 480, { suffix:'+' });
+
+// Hero mini chart
+const heroResult = SimEngine.project(SimEngine.defaultProfile(), 12);
+const ctx = document.getElementById('heroChart');
+new Chart(ctx, {
+  type:'line',
+  data:{
+    labels: heroResult.series.map(r=>'M'+r.month),
+    datasets:[
+      { label:'Revenue', data: heroResult.series.map(r=>r.revenue), borderColor:'#38D9C9', backgroundColor:'rgba(56,217,201,0.12)', fill:true, tension:0.4, pointRadius:0, borderWidth:2 },
+      { label:'Expenses', data: heroResult.series.map(r=>r.expenses), borderColor:'#F5A623', backgroundColor:'transparent', borderDash:[4,4], tension:0.4, pointRadius:0, borderWidth:2 }
+    ]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:true,
+    plugins:{ legend:{ labels:{ color:'#8A97B4', boxWidth:10, font:{ family:'JetBrains Mono', size:10 } } } },
+    scales:{
+      x:{ ticks:{ color:'#5B6784', font:{ size:10 } }, grid:{ color:'rgba(148,168,204,0.06)' } },
+      y:{ ticks:{ color:'#5B6784', font:{ size:10 }, callback:v=>SimEngine.fmtMoney(v) }, grid:{ color:'rgba(148,168,204,0.06)' } }
+    }
+  }
+});
+</script>
+</body>
+</html>

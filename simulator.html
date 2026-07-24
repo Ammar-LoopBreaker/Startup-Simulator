@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What-If Simulator — Startup Simulator AI</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <div class="main-area">
+    <div class="main-head">
+      <div style="display:flex; align-items:center; gap:14px;">
+        <button class="btn btn-ghost btn-sm" data-nav-toggle id="navToggle"><i class="fa-solid fa-bars"></i></button>
+        <div>
+          <div class="panel-title" style="margin:0;">What-If Simulator</div>
+          <h2 style="font-size:19px; margin-top:2px;">Test a strategy before you commit to it</h2>
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-sm" id="resetBtn"><i class="fa-solid fa-rotate-left"></i> Reset Scenario</button>
+    </div>
+
+    <div class="main-body">
+      <div style="display:grid; grid-template-columns:340px 1fr; gap:20px;" class="sim-grid">
+
+        <!-- CONTROLS -->
+        <div class="panel panel-pad" style="align-self:start; position:sticky; top:96px;">
+          <div class="panel-title" style="margin-bottom:18px;">Scenario Controls</div>
+
+          <div class="field">
+            <div class="slider-row"><label style="margin:0;">Price Change</label><span class="slider-val" id="priceVal">0%</span></div>
+            <input type="range" id="priceSlider" min="-40" max="60" value="0" step="5">
+            <div class="hint">Raise or lower your monthly price relative to today.</div>
+          </div>
+
+          <div class="field">
+            <div class="slider-row"><label style="margin:0;">Additional Hires</label><span class="slider-val" id="hiresVal">+0</span></div>
+            <input type="range" id="hiresSlider" min="-5" max="15" value="0" step="1">
+            <div class="hint">Add or remove team members from headcount.</div>
+          </div>
+
+          <div class="field">
+            <div class="slider-row"><label style="margin:0;">Marketing Budget</label><span class="slider-val" id="marketingVal">1.0x</span></div>
+            <input type="range" id="marketingSlider" min="0.25" max="3" value="1" step="0.25">
+            <div class="hint">Multiplier applied to current monthly ad spend.</div>
+          </div>
+
+          <div class="field">
+            <div class="slider-row"><label style="margin:0;">Launch Delay</label><span class="slider-val" id="delayVal">0 mo</span></div>
+            <input type="range" id="delaySlider" min="0" max="6" value="0" step="1">
+            <div class="hint">Push back go-live by this many months.</div>
+          </div>
+
+          <div class="field">
+            <label>Payment Model</label>
+            <div class="toggle-group">
+              <button type="button" class="toggle-pill active" data-model="subscription">Subscription</button>
+              <button type="button" class="toggle-pill" data-model="one-time">One-Time</button>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Market Expansion</label>
+            <div class="toggle-group">
+              <button type="button" class="toggle-pill" data-expand="0">Stay Local</button>
+              <button type="button" class="toggle-pill" data-expand="1">Expand Country</button>
+            </div>
+          </div>
+
+          <div style="border-top:1px solid var(--line); padding-top:16px; margin-top:6px;">
+            <div class="stat-label" style="margin-bottom:10px;">Quick presets</div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <button type="button" class="btn btn-ghost btn-sm btn-block" data-preset="aggressive">🚀 Aggressive Growth</button>
+              <button type="button" class="btn btn-ghost btn-sm btn-block" data-preset="lean">🧊 Lean & Cautious</button>
+              <button type="button" class="btn btn-ghost btn-sm btn-block" data-preset="premium">💎 Premium Pricing</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- RESULTS -->
+        <div>
+          <div class="grid-4" id="deltaGrid" style="margin-bottom:20px;"></div>
+
+          <div class="panel panel-pad" style="margin-bottom:20px;">
+            <div class="panel-head">
+              <div class="panel-title">Baseline <b>vs</b> Scenario — Revenue</div>
+              <div style="display:flex; gap:14px; font-size:12px;">
+                <span class="stat-label"><i class="fa-solid fa-circle" style="color:var(--text-muted); font-size:8px;"></i> Baseline</span>
+                <span class="stat-label"><i class="fa-solid fa-circle" style="color:var(--amber); font-size:8px;"></i> Scenario</span>
+              </div>
+            </div>
+            <canvas id="compareChart" height="240"></canvas>
+          </div>
+
+          <div class="panel panel-pad">
+            <div class="panel-head"><div class="panel-title">Scenario <b>Comparison Table</b></div></div>
+            <table>
+              <thead><tr><th>Metric</th><th>Baseline</th><th>Scenario</th><th>Change</th></tr></thead>
+              <tbody id="compareTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script src="js/sidebar.js"></script>
+<script src="js/simulation.js"></script>
+<script src="js/app.js"></script>
+<script>
+const baseProfile = ProfileStore.load();
+let deltas = { priceChangePct:0, hires:0, marketingMultiplier:1, launchDelayMonths:0, businessModel:'subscription', expansion:0 };
+let compareChart;
+
+const priceSlider = document.getElementById('priceSlider');
+const hiresSlider = document.getElementById('hiresSlider');
+const marketingSlider = document.getElementById('marketingSlider');
+const delaySlider = document.getElementById('delaySlider');
+
+function fmtSigned(n, suffix=''){ return (n>0?'+':'') + n + suffix; }
+
+function readControls(){
+  deltas.priceChangePct = Number(priceSlider.value);
+  deltas.hires = Number(hiresSlider.value);
+  deltas.marketingMultiplier = Number(marketingSlider.value);
+  deltas.launchDelayMonths = Number(delaySlider.value);
+
+  document.getElementById('priceVal').textContent = fmtSigned(deltas.priceChangePct, '%');
+  document.getElementById('hiresVal').textContent = fmtSigned(deltas.hires);
+  document.getElementById('marketingVal').textContent = deltas.marketingMultiplier.toFixed(2) + 'x';
+  document.getElementById('delayVal').textContent = deltas.launchDelayMonths + ' mo';
+}
+
+function run(){
+  readControls();
+  const { base, scenario } = SimEngine.whatIf(baseProfile, deltas);
+  renderDeltas(base, scenario);
+  renderChart(base, scenario);
+  renderTable(base, scenario);
+}
+
+function renderDeltas(base, scenario){
+  const rows = [
+    { label:'Final Revenue', b: base.totals.finalRevenue, s: scenario.totals.finalRevenue, fmt:SimEngine.fmtMoney, icon:'fa-sack-dollar' },
+    { label:'Health Score', b: base.totals.healthScore, s: scenario.totals.healthScore, fmt:v=>v, icon:'fa-heart-pulse' },
+    { label:'Break-Even', b: base.totals.breakEvenMonth||24, s: scenario.totals.breakEvenMonth||24, fmt:v=>'M'+v, icon:'fa-flag-checkered', invert:true },
+    { label:'Runway', b: base.totals.runwayMonths, s: scenario.totals.runwayMonths, fmt:v=> (v>=99?'24+':v)+' mo', icon:'fa-hourglass-half' },
+  ];
+  document.getElementById('deltaGrid').innerHTML = rows.map(r=>{
+    const diff = r.s - r.b;
+    const better = r.invert ? diff <= 0 : diff >= 0;
+    return `
+    <div class="panel stat-card">
+      <div class="stat-top"><div class="stat-icon"><i class="fa-solid ${r.icon}"></i></div></div>
+      <div class="stat-value" style="font-size:21px;">${r.fmt(r.s)}</div>
+      <div class="stat-label">${r.label}</div>
+      <div class="stat-delta ${better?'up':'down'}"><i class="fa-solid ${better?'fa-arrow-trend-up':'fa-arrow-trend-down'}"></i> vs baseline ${r.fmt(r.b)}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderChart(base, scenario){
+  const labels = base.series.map(r=>'M'+r.month);
+  const baseData = base.series.map(r=>r.revenue);
+  const scenData = scenario.series.map(r=>r.revenue);
+
+  if (compareChart){
+    compareChart.data.labels = labels;
+    compareChart.data.datasets[0].data = baseData;
+    compareChart.data.datasets[1].data = scenData;
+    compareChart.update();
+    return;
+  }
+  compareChart = new Chart(document.getElementById('compareChart'), {
+    type:'line',
+    data:{ labels, datasets:[
+      { label:'Baseline', data:baseData, borderColor:'#5B6784', backgroundColor:'transparent', borderDash:[3,4], tension:0.35, pointRadius:0, borderWidth:2 },
+      { label:'Scenario', data:scenData, borderColor:'#F5A623', backgroundColor:'rgba(245,166,35,0.10)', fill:true, tension:0.35, pointRadius:0, borderWidth:2.5 },
+    ]},
+    options:{
+      responsive:true, maintainAspectRatio:true,
+      plugins:{ legend:{ display:false } },
+      scales:{
+        x:{ ticks:{ color:'#5B6784', font:{ size:9 }, maxTicksLimit:8 }, grid:{ display:false } },
+        y:{ ticks:{ color:'#5B6784', font:{ size:10 }, callback:v=>SimEngine.fmtMoney(v) }, grid:{ color:'rgba(148,168,204,0.06)' } }
+      }
+    }
+  });
+}
+
+function renderTable(base, scenario){
+  const rows = [
+    ['Final Customers', base.totals.finalCustomers, scenario.totals.finalCustomers, v=>v.toLocaleString()],
+    ['Monthly Revenue', base.totals.finalRevenue, scenario.totals.finalRevenue, SimEngine.fmtMoney],
+    ['Monthly Expenses', base.totals.finalExpenses, scenario.totals.finalExpenses, SimEngine.fmtMoney],
+    ['Avg Burn Rate', base.totals.avgBurn, scenario.totals.avgBurn, SimEngine.fmtMoney],
+    ['Cash Runway (mo)', base.totals.runwayMonths, scenario.totals.runwayMonths, v=> v>=99?'24+':v],
+    ['Marketing ROI', base.totals.marketingROI, scenario.totals.marketingROI, v=>v+'%'],
+    ['Health Score', base.totals.healthScore, scenario.totals.healthScore, v=>v],
+  ];
+  document.getElementById('compareTable').innerHTML = rows.map(([label,b,s,fmt])=>{
+    const diff = s - b;
+    const cls = diff > 0 ? 'up' : diff < 0 ? 'down' : '';
+    return `<tr>
+      <td>${label}</td>
+      <td class="mono">${fmt(b)}</td>
+      <td class="mono" style="color:var(--amber); font-weight:700;">${fmt(s)}</td>
+      <td class="mono stat-delta ${cls}" style="margin:0;">${diff===0?'—':(diff>0?'+':'')+fmt(diff).toString().replace('$','$')}</td>
+    </tr>`;
+  }).join('');
+}
+
+[priceSlider, hiresSlider, marketingSlider, delaySlider].forEach(s => s.addEventListener('input', run));
+
+document.querySelectorAll('[data-model]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('[data-model]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    deltas.businessModel = btn.getAttribute('data-model');
+    run();
+  });
+});
+document.querySelectorAll('[data-expand]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('[data-expand]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    deltas.expansion = Number(btn.getAttribute('data-expand'));
+    run();
+  });
+});
+
+const presets = {
+  aggressive: { priceChangePct:-10, hires:5, marketingMultiplier:2.5, launchDelayMonths:0, expansion:1 },
+  lean:       { priceChangePct:10,  hires:-2, marketingMultiplier:0.5, launchDelayMonths:0, expansion:0 },
+  premium:    { priceChangePct:40,  hires:0, marketingMultiplier:0.75, launchDelayMonths:0, expansion:0 },
+};
+document.querySelectorAll('[data-preset]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const p = presets[btn.getAttribute('data-preset')];
+    priceSlider.value = p.priceChangePct;
+    hiresSlider.value = p.hires;
+    marketingSlider.value = p.marketingMultiplier;
+    delaySlider.value = p.launchDelayMonths;
+    deltas.expansion = p.expansion;
+    document.querySelectorAll('[data-expand]').forEach(b=> b.classList.toggle('active', Number(b.getAttribute('data-expand'))===p.expansion));
+    run();
+  });
+});
+
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  priceSlider.value = 0; hiresSlider.value = 0; marketingSlider.value = 1; delaySlider.value = 0;
+  deltas.businessModel = 'subscription'; deltas.expansion = 0;
+  document.querySelectorAll('[data-model]').forEach(b=> b.classList.toggle('active', b.getAttribute('data-model')==='subscription'));
+  document.querySelectorAll('[data-expand]').forEach(b=> b.classList.toggle('active', b.getAttribute('data-expand')==='0'));
+  run();
+});
+
+run();
+</script>
+<style>
+@media (max-width:1080px){ .sim-grid{ grid-template-columns:1fr !important; } .sim-grid .panel[style*="sticky"]{ position:static !important; } }
+</style>
+</body>
+</html>
